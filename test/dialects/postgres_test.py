@@ -157,3 +157,20 @@ def test_get_keywords() -> None:
     expected_result_3 = ["B"]
 
     assert sorted(get_keywords(kw_list, "reserved")) == sorted(expected_result_3)
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "SET TRANSACTION READ WRITE",
+        'SET TRANSACTION SNAPSHOT "abc123"',
+    ],
+)
+def test_set_transaction_is_parsable(raw: str) -> None:
+    """Ensure that SET TRANSACTION is parsable."""
+    cfg = FluffConfig(
+        configs={"core": {"dialect": "postgres"}}
+    )
+    lnt = Linter(config=cfg)
+    result = lnt.lint_string(raw)
+    assert result.num_violations() == 0
